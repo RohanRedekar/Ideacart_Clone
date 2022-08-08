@@ -1,9 +1,10 @@
 import { actionTypes } from "./action";
+import Cookies from "js-cookie";
 
 const initState = {
   loading: false,
   loggedIn: false,
-  loggedInUser: localStorage.getItem("loggedInUser") || "",
+  loggedInUser: "",
   error: "",
 };
 
@@ -33,15 +34,15 @@ export const loginReducer = (state = initState, { type, payload }) => {
         loggedInUser: "",
         error: payload,
       };
-      case actionTypes.USER_LOGOUT_SUCCESS:
-        localStorage.removeItem("loggedInUser");
-        return {
-          ...state,
-          loading: false,
-          loggedIn: false,
-          loggedInUser: "",
-          error: "",
-        };
+    case actionTypes.USER_LOGOUT_SUCCESS:
+      Cookies.remove("accessToken");
+      return {
+        ...state,
+        loading: false,
+        loggedIn: false,
+        loggedInUser: "",
+        error: "",
+      };
     default:
       return state;
   }

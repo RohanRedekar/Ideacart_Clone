@@ -1,9 +1,11 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 export const actionTypes = {
   USER_LOGIN_REQUEST: "USER_LOGIN_REQUEST",
   USER_LOGIN_SUCCESS: "USER_LOGIN_SUCCESS",
   USER_LOGIN_FAILURE: "USER_LOGIN_FAILURE",
   USER_LOGOUT_SUCCESS: "USER_LOGOUT_SUCCESS",
+  LOGGEDIN_AUTH: "LOGGEDIN_AUTH",
 };
 
 export const userLoginRequest = (payload) => ({
@@ -30,7 +32,7 @@ export const Login = (payload) => (dispatch) => {
   })
     .then((res) => {
       if (res.statusText === "OK") {
-        localStorage.setItem("loggedInUser", res.data.user.name);
+        Cookies.set("accessToken", res.data.token);
         return dispatch(userLoginSuccess(res.data.user.name));
       } else {
         return dispatch(
@@ -44,3 +46,17 @@ export const Login = (payload) => (dispatch) => {
 export const userLogoutSuccess = () => ({
   type: actionTypes.USER_LOGOUT_SUCCESS,
 });
+
+export const loggedInAuth = () => ({
+  type: actionTypes.LOGGEDIN_AUTH,
+});
+
+export const authenticate = (token) => (dispatch) => {
+  return axios({
+    mathod: "POST",
+    url: "https://login-register-333.herokuapp.com/authenticate",
+    headers: {
+      authentication: `Bearer ${token}`,
+    },
+  }).then((res) => dispatch(userLoginSuccess(res.data.user.name)));
+};

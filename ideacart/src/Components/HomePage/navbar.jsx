@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Flex,
@@ -18,13 +18,14 @@ import {
 
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { userLogoutSuccess } from "../../Redux/Login/action";
+import { useSelector, useDispatch } from "react-redux";
+import { authenticate, userLogoutSuccess } from "../../Redux/Login/action";
 import { getBooks } from "../../Redux/TopReads/action";
+import Cookies from "js-cookie";
 
 export const Navbar = () => {
-  const loggedInUser = useSelector((store) => store.login.loggedInUser);
+  const { loggedIn, loggedInUser } = useSelector((store) => store.login);
+  const signedUp = useSelector((store) => store.signUp.signedUp);
   const dispatch = useDispatch();
   const { isOpen, onToggle } = useDisclosure();
   const [search, setSearch] = useState("");
@@ -32,6 +33,12 @@ export const Navbar = () => {
   const searchBooks = () => {
     dispatch(getBooks(search));
   };
+
+  useEffect(() => {
+    let token = Cookies.get("accessToken");
+    if (!token) return;
+    else dispatch(authenticate(token));
+  }, [dispatch]);
 
   return (
     <Box backgroundColor={"rgb(40,116,240)"} width='100%'>
@@ -95,12 +102,12 @@ export const Navbar = () => {
             <Box>
               <Link to={"/contact"}>Contact</Link>
             </Box>
-            {loggedInUser.length === 0 && (
+            {!loggedIn && (
               <Box>
                 <Link to={"/signin"}>Sign In</Link>
               </Box>
             )}
-            {loggedInUser.length === 0 && (
+            {(!signedUp && !loggedIn) && (
               <Box>
                 <Link to={"/signup"}>Sign Up</Link>
               </Box>

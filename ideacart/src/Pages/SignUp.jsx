@@ -54,7 +54,7 @@ export default function SignUpCard() {
     } else {
       dispatch(Signup(formData)).then((res) =>
         res.type === "USER_SIGNUP_SUCCESS"
-          ? navigate("/login")
+          ? navigate("/signin")
           : alert("Invalid fields, please enter correct data")
       );
     }
